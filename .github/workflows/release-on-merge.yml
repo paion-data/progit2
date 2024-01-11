@@ -1,8 +1,12 @@
-name: Release on push to main
+name: Release on push to master
 
 on:
   push:
     branches: [ master ]
+
+env:
+  USER: QubitPi
+  EMAIL: jack20220723@gmail.com
 
 jobs:
   release:
@@ -21,14 +25,6 @@ jobs:
     - name: Build release assets
       run: bundle exec rake book:build
 
-    - name: Compute tag name
-      id: compute-tag
-      run: |
-        echo Computing next tag number
-        LASTPATCH=$(git describe --tags | cut -d- -f1 | cut -d. -f3)
-        PATCH=$(($LASTPATCH+1))
-        echo "tagname=2.1.${PATCH}" >> $GITHUB_OUTPUT
-
     - name: Prepare for deployment to GitHub Pages
       run: |
         mkdir gh-pages-content
@@ -40,12 +36,28 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: gh-pages-content
         user_name: QubitPi
-        user_email: jack20191124@proton.me
+        user_email: jack20220723@gmail.com
+
+    - name: Compute tag name
+      id: compute-tag
+      run: |
+        echo Computing next tag number
+        LASTPATCH=$(git describe --tags | cut -d- -f1 | cut -d. -f3)
+        PATCH=$(($LASTPATCH+2))
+        
+        git config --global user.name '$USER'
+        git config --global user.email '$EMAIL'
+        git tag -a 2.1.${PATCH} -m "Temporary tag"
+        git push origin 2.1.${PATCH}
+        
+        PATCH=$(($PATCH+1))
+        
+        echo "tagname=2.1.${PATCH}" >> $GITHUB_OUTPUT
 
     - name: Create release
       uses: ncipollo/release-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ steps.compute-tag.outputs.tagname }}
-        commit: main
+        commit: master
         artifacts: './progit.epub,./progit.fb2.zip,./progit.mobi,./progit.pdf,./progit.html'
