@@ -1,6 +1,7 @@
 name: Release on push to master
 
 on:
+  pull_request:
   push:
     branches: [ master ]
 
@@ -33,6 +34,9 @@ jobs:
     - name: Load CNAME file
       run: echo git.qubitpi.org > gh-pages-content/CNAME
 
+    - name: Load favicon
+      run: mv favicon.ico gh-pages-content/
+
     - name: Deploy HTML book to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
@@ -43,21 +47,23 @@ jobs:
 
     - name: Compute tag name
       id: compute-tag
+      if: github.ref == 'refs/heads/master'
       run: |
         echo Computing next tag number
         LASTPATCH=$(git describe --tags | cut -d- -f1 | cut -d. -f3)
         PATCH=$(($LASTPATCH+2))
-        
+
         git config --global user.name '$USER'
         git config --global user.email '$EMAIL'
         git tag -a 2.1.${PATCH} -m "Temporary tag"
         git push origin 2.1.${PATCH}
-        
+
         PATCH=$(($PATCH+1))
-        
+
         echo "tagname=2.1.${PATCH}" >> $GITHUB_OUTPUT
 
     - name: Create release
+      if: github.ref == 'refs/heads/master'
       uses: ncipollo/release-action@v1
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
