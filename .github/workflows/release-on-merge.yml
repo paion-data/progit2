@@ -41,7 +41,7 @@ jobs:
         publish_dir: gh-pages-content
         user_name: ${{ env.USER }}
         user_email: ${{ env.EMAIL }}
-        cname: git.qubitpi.org
+        cname: git.paion-data.dev
 
     - name: Compute tag name
       id: compute-tag
@@ -53,8 +53,8 @@ jobs:
 
         git config --global user.name '$USER'
         git config --global user.email '$EMAIL'
-        git tag -a 2.2.${PATCH} -m "Temporary tag"
-        git push origin 2.2.${PATCH}
+        git tag -a 2.3.${PATCH} -m "Temporary tag"
+        git push origin 2.3.${PATCH}
 
         PATCH=$(($PATCH+1))
 
