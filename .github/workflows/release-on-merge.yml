@@ -31,9 +31,6 @@ jobs:
         mkdir gh-pages-content
         mv progit.html gh-pages-content/index.html
 
-    - name: Load CNAME file
-      run: echo git.qubitpi.org > gh-pages-content/CNAME
-
     - name: Load favicon
       run: mv favicon.ico gh-pages-content/
 
@@ -42,8 +39,9 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: gh-pages-content
-        user_name: QubitPi
-        user_email: jack20220723@gmail.com
+        user_name: ${{ env.USER }}
+        user_email: ${{ env.EMAIL }}
+        cname: git.qubitpi.org
 
     - name: Compute tag name
       id: compute-tag
@@ -55,8 +53,8 @@ jobs:
 
         git config --global user.name '$USER'
         git config --global user.email '$EMAIL'
-        git tag -a 2.1.${PATCH} -m "Temporary tag"
-        git push origin 2.1.${PATCH}
+        git tag -a 2.2.${PATCH} -m "Temporary tag"
+        git push origin 2.2.${PATCH}
 
         PATCH=$(($PATCH+1))
 
